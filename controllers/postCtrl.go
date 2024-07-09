@@ -8,7 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type createPostRequest struct {
+type postRequestData struct {
 	Title string `json:"title" binding:"required"`
 	Body string `json:"body" binding:"required"`
 }
@@ -21,7 +21,7 @@ type createPostRequest struct {
 
 func PostCreate(ctx *gin.Context) {
 	// Get data off request body
-    var req createPostRequest
+    var req postRequestData
 
 	if err := ctx.ShouldBindJSON(&req); err != nil{
 		ctx.JSON(http.StatusBadRequest, err)
@@ -37,16 +37,69 @@ func PostCreate(ctx *gin.Context) {
 		return
 	}
 	// Return it
-	ctx.JSON(http.StatusOK, gin.H{"messgae": "Post created successfully"})
+	ctx.JSON(http.StatusOK, gin.H{"message": "Post created successfully"})
 }
 
 
-func GetPosts(ctx *gin.Context){
+func GetAllPosts(ctx *gin.Context){
 	// Get posts
     var posts []models.Post
 	initializers.DB.Find(&posts)
 
 	// Respond with them
 	ctx.JSON(http.StatusOK, gin.H{"Post": posts})
+
+}
+
+// Get post by ID request handler
+type getPostID struct {
+	ID int64 `uri:"id" binding:"required,min=1"`
+}
+
+func GetAPost(ctx *gin.Context){
+   // Get id off request URL
+   var req getPostID
+
+   if err := ctx.ShouldBindUri(&req); err != nil {
+	ctx.JSON(http.StatusBadRequest, err)
+	return
+   }
+
+	// Get posts
+	var post models.Post
+	initializers.DB.First(&post, req.ID)
+
+	// Respond with them
+	ctx.JSON(http.StatusOK, gin.H{"Post": post})
+
+}
+
+func UpdatePost (ctx *gin.Context){
+	// Get id off request Url
+    var req getPostID
+
+	if err := ctx.ShouldBindUri(&req); err != nil{
+		ctx.JSON(http.StatusBadRequest, err)
+		return
+	}
+
+	// Get the data off request body
+	var arg postRequestData
+	if err := ctx.ShouldBindJSON(&arg); err != nil{
+		ctx.JSON(http.StatusBadRequest, err)
+		return
+	}
+    
+	// Find the post we are updating
+    var post models.Post
+	initializers.DB.Find(&post, req.ID)
+
+	// Update it
+    initializers.DB.Model(&post).Updates(models.Post{
+		Title: arg.Title,
+		Body: arg.Body,
+	})
+	// Response with status
+	ctx.JSON(http.StatusOK, gin.H{"message": "Post updated successfully"})
 
 }

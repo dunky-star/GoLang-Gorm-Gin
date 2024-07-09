@@ -2,6 +2,6 @@ POST http://localhost:9090/api/v1/posts
 content-type: application/json
 
 {
-    "title": "From req title",
-    "body": "From req body"
+    "title": "Leveraging GORM in Go Lang",
+    "body": "Simple CRUD REST API in Go Lang utilising GORM as ORM and Gin frameworks"
 }
