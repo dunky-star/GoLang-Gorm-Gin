@@ -1,0 +1,7 @@
+POST http://localhost:9090/api/v1/posts
+content-type: application/json
+
+{
+    "title": "From req title",
+    "body": "From req body"
+}
