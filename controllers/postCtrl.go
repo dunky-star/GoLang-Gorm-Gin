@@ -103,3 +103,19 @@ func UpdatePost (ctx *gin.Context){
 	ctx.JSON(http.StatusOK, gin.H{"message": "Post updated successfully"})
 
 }
+
+
+func DeletePost(ctx *gin.Context){
+	// Get ID off the URL
+	var req getPostID
+	if err := ctx.ShouldBindUri(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, err)
+		return
+	}
+
+	// Delete the post
+	initializers.DB.Delete(&models.Post{}, req.ID)
+
+	// Response with success of failed
+	ctx.JSON(http.StatusOK, gin.H{"message": "Deleted successfully!"})
+}
